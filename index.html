@@ -1,0 +1,101 @@
+<!doctype HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>OWL Players</title>
+  <link rel="icon" href="images/icons/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+
+<body>
+  <main>
+    <h1 class="title">Overwatch League Players</h1>
+
+    <div class="filters">
+      <div class="teamButtons">
+        <img v-for="(team, teamId) in teamData" class="team-button"
+          v-on:click="updateTeam(teamId); filterPlayers();"
+          onclick="this.classList.toggle('hidden');"
+          :src="team.teamLogo" height="40" width="40">
+        <img class="all-teams team-button" onclick="" src="images/icons/owl-icon.png" height="85" width="80">
+      </div>
+      <div class="roleButtons">
+        <img v-for="(isShown, role) in showRoles" class="role-button"
+          :src="'images/icons/roles/' + role + '.png'"
+          v-on:click="updateRole(role); filterPlayers();"
+          onclick="this.classList.toggle('hidden');" height="40" width="40">
+        <img class="all-roles role-button" src="images/icons/owl-icon.png" onclick="this.classList.toggle('hidden');" height="40" width="40">
+      </div>
+    </div>
+
+    <table class="playerTable" align="middle">
+      <thead>
+        <tr>
+          <th v-on:click="sortToggle('name')">Player
+            <template v-if="sortAscending.name % 2 != 0 && sortAscending.name > 0">↑</template>
+            <template v-if="sortAscending.name % 2 == 0 && sortAscending.name > 0">↓</template>
+          </th>
+          <th>Headshot</th>
+          <th v-on:click="sortToggle('number')">Number
+            <template v-if="sortAscending.number % 2 != 0 && sortAscending.number > 0">↑</template>
+            <template v-if="sortAscending.number % 2 == 0 && sortAscending.number > 0">↓</template>
+          </th>
+          <th v-on:click="sortToggle('teamId')">Team
+            <template v-if="sortAscending.teamId % 2 != 0 && sortAscending.teamId > 0">↑</template>
+            <template v-if="sortAscending.teamId % 2 == 0 && sortAscending.teamId > 0">↓</template>
+          </th>
+          <th v-on:click="sortToggle('role')">Role
+            <template v-if="sortAscending.role % 2 != 0 && sortAscending.role > 0">↑</template>
+            <template v-if="sortAscending.role % 2 == 0 && sortAscending.role > 0">↓</template>
+          </th>
+          <th v-on:click="sortToggle('twitchName')">Twitch
+            <template v-if="sortAscending.twitchName % 2 != 0 && sortAscending.twitchName > 0">↑</template>
+            <template v-if="sortAscending.twitchName % 2 == 0 && sortAscending.twitchName > 0">↓</template>
+          </th>
+          <th>Socials</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="player in playerData">
+          <tr v-show="player.show" :style="{ 'background-color': hexToRgb(teamData[player.teamId].teamColors.primary.color, 0.4) }">
+            <td class="playerHandle">{{player.name}}</td>
+            <td class="headshot"><img  :src="player.headshot" height="40" width="40"></td>
+            <td class="player-number">{{player.number}}</td>
+            <td class="teamlogo" :value="teamData[player.teamId].name"><img :src="teamData[player.teamId].teamLogo" height="40" width="40"></td>
+            <td class="role" :value="player.role">
+              <template v-if="player.role == 'support'"><img src="images/icons/roles/support.png" height="30" width="30"></template>
+              <template v-else-if="player.role == 'offense'"><img src="images/icons/roles/offense.png" height="30" width="30"></template>
+              <template v-else-if="player.role == 'tank'"><img src="images/icons/roles/tank.png" height="30" width="30"></template>
+            </td>
+            <td class="twitch">
+                <a v-for="account in player.socials" v-if="account.type == 'TWITCH'" :href="account.url"><img src="images/icons/socials/twitch.png" height="20" width="20"></a>
+                <!-- <span class="live-dot"></span>
+                <span v-show="player.live" class="num-viewers">{{player.numViewers}}<span> -->
+            </td>
+            <td class="socials">
+                <a v-for="account in player.socials" v-if="account.type == 'TWITTER'" :href="account.url"><img src="images/icons/socials/twitter.png" height="20" width="20"></a>
+                <a v-for="account in player.socials" v-if="account.type == 'INSTAGRAM'" :href="account.url"><img src="images/icons/socials/instagram.png" height="20" width="20"></a>
+                <a v-for="account in player.socials" v-if="account.type == 'DISCORD'" :href="account.url"><img src="images/icons/socials/discord.png" height="20" width="20"></a>
+                <a v-for="account in player.socials" v-if="account.type == 'FACEBOOK'" :href="account.url"><img src="images/icons/socials/facebook.png" height="20" width="20"></a>
+                <a v-for="account in player.socials" v-if="account.type == 'YOUTUBE_CHANNEL'" :href="account.url"><img src="images/icons/socials/youtube.png" height="20" width="20"></a>
+                <a v-for="account in player.socials" v-if="account.type == 'WEIBO'" :href="account.url"><img src="images/icons/socials/weibo.png" height="20" width="20"></a>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
+  </main>
+
+  <hr>
+  <footer>
+    <a href="https://api.overwatchleague.com/v2/teams/"><img src="images/icons/owl-icon.png" height="20" width="20"></a>    
+    <a href="https://github.com/timothyng-164"><img src="images/icons/github.png" height="20" width="20"></a>
+  </footer>
+</body>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="main.js"></script>
+</html>
